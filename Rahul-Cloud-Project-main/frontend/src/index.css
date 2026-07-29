@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    font-feature-settings: "cv02","cv03","cv04","cv11","ss01";
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-ink-50 text-ink-900;
+    min-height: 100dvh;
+  }
+
+  .dark body { @apply bg-ink-950 text-ink-100; }
+
+  ::selection { background: #b8bfc9; color: #006bf7; }
+  .dark ::selection { background: #1d4ed8; color: #fff; }
+
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { @apply bg-ink-300 dark:bg-ink-700 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-ink-400 dark:bg-ink-600; }
+}
+
+@layer components {
+
+  .surface {
+    @apply bg-white dark:bg-ink-900
+           border border-ink-200 dark:border-ink-800;
+  }
+
+  .field {
+    @apply w-full px-3 py-2 text-sm bg-white dark:bg-ink-900
+           border border-ink-200 dark:border-ink-800 rounded-lg
+           text-ink-900 dark:text-ink-100
+           placeholder:text-ink-400 dark:placeholder:text-ink-600
+           focus:outline-none focus:ring-2 focus:ring-accent-500/20
+           focus:border-accent-500 dark:focus:border-accent-400
+           transition-[border-color,box-shadow] duration-150;
+  }
+  .field-error {
+    @apply border-red-400 dark:border-red-500
+           focus:ring-red-400/20 focus:border-red-400;
+  }
+
+  .field-label {
+    @apply block text-[11px] font-semibold tracking-wide uppercase
+           text-ink-500 dark:text-ink-400 mb-1.5;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5
+           text-sm font-medium
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+           disabled:pointer-events-none disabled:opacity-40
+           select-none transition-all duration-150;
+  }
+
+  .btn-primary {
+    @apply btn px-3.5 py-2 rounded-lg
+           bg-ink-900 dark:bg-ink-100
+           text-white dark:text-ink-900
+           hover:bg-ink-700 dark:hover:bg-white
+           focus-visible:ring-ink-900 dark:focus-visible:ring-ink-100
+           shadow-xs active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply btn px-3.5 py-2 rounded-lg
+           bg-white dark:bg-ink-900
+           border border-ink-200 dark:border-ink-700
+           text-ink-700 dark:text-ink-300
+           hover:bg-ink-50 dark:hover:bg-ink-800
+           hover:border-ink-300 dark:hover:border-ink-600
+           focus-visible:ring-ink-400 active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    @apply btn px-2.5 py-1.5 rounded-md
+           text-ink-500 dark:text-ink-400
+           hover:bg-ink-100 dark:hover:bg-ink-800
+           hover:text-ink-800 dark:hover:text-ink-200
+           focus-visible:ring-ink-400;
+  }
+
+  .btn-danger {
+    @apply btn px-3.5 py-2 rounded-lg
+           bg-red-600 hover:bg-red-700 text-white
+           focus-visible:ring-red-500 shadow-xs active:scale-[0.98];
+  }
+
+  .btn-sm { @apply px-2.5 py-1.5 text-xs; }
+  .btn-icon { @apply p-1.5 rounded-md; }
+
+  .skel { @apply bg-ink-200 dark:bg-ink-800 rounded animate-shimmer; }
+
+  .data-table { @apply w-full text-sm; }
+  .data-table th {
+    @apply px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wide
+           text-ink-400 dark:text-ink-500
+           border-b border-ink-100 dark:border-ink-800/80
+           bg-ink-50/60 dark:bg-ink-900/60
+           select-none cursor-pointer;
+  }
+  .data-table td {
+    @apply px-4 py-3
+           border-b border-ink-100/80 dark:border-ink-800/60
+           text-ink-700 dark:text-ink-300;
+  }
+  .data-table tbody tr:last-child td { @apply border-b-0; }
+  .data-table tbody tr {
+    @apply transition-colors duration-75;
+  }
+  .data-table tbody tr:hover td {
+    @apply bg-ink-50/70 dark:bg-ink-800/30;
+  }
+
+  .page { @apply animate-in; }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .no-tap-highlight { -webkit-tap-highlight-color: transparent; }
+
+  .divide-y-thin > * + * { border-top: 1px solid; }
+}

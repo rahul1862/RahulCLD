@@ -1,0 +1,51 @@
+databases:
+  - name: userhub-db
+    plan: free
+    postgresMajorVersion: 16
+
+services:
+  # Backend — Express REST API (backend/), wired to the middleware/ app layer
+  - type: web
+    name: backend-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: false
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 24.11.1
+      # JWT signing secret — Render generates a strong random value on first deploy.
+      - key: JWT_SECRET
+        generateValue: true
+      # Demo admin. Override ADMIN_PASSWORD in the dashboard for a private deployment;
+      # the code defaults (admin@userhub.dev / userhub-demo) power the public demo.
+      - key: ADMIN_EMAIL
+        value: admin@userhub.dev
+      # - key: ADMIN_PASSWORD
+      #   sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: userhub-db
+          property: connectionString
+
+  # Frontend — React/Vite static build (frontend/)
+  - type: static
+    name: userhub-web
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    autoDeploy: false
+    envVars:
+      # Set this manually in the Render dashboard once backend-api's URL is known,
+      # e.g. https://backend-api.onrender.com/api
+      - key: VITE_API_URL
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

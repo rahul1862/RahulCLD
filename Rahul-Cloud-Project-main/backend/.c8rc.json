@@ -1,0 +1,12 @@
+{
+  "all": true,
+  "include": ["lib/**/*.js", "routes/**/*.js", "middleware/**/*.js", "logger.js", "db.js"],
+  "exclude": ["tests/**", "node_modules/**", "index.js", "appFactory.js"],
+  "reporter": ["text", "text-summary", "lcov", "html", "json-summary"],
+  "reports-dir": "coverage",
+  "check-coverage": true,
+  "lines": 80,
+  "statements": 80,
+  "functions": 80,
+  "branches": 80
+}
