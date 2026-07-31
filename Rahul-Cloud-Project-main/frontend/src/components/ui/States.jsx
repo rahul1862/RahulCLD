@@ -1,5 +1,4 @@
 import { Users, AlertCircle, SearchX } from "lucide-react";
-
 export function EmptyState({ title, message, action }) {
   return (
     <div className="flex flex-col items-center justify-center py-14 text-center px-4">
@@ -7,12 +6,15 @@ export function EmptyState({ title, message, action }) {
         <Users size={20} className="text-ink-300 dark:text-ink-600" strokeWidth={1.5} />
       </div>
       <p className="text-sm font-medium text-ink-700 dark:text-ink-300 mb-1">{title}</p>
-      {message && <p className="text-xs text-ink-400 dark:text-ink-600 max-w-[220px] leading-relaxed">{message}</p>}
+      {message && (
+        <p className="text-xs text-ink-400 dark:text-ink-600 max-w-[220px] leading-relaxed">
+          {message}
+        </p>
+      )}
       {action && <div className="mt-4">{action}</div>}
     </div>
   );
 }
-
 export function SearchEmpty({ query }) {
   return (
     <div className="flex flex-col items-center justify-center py-14 text-center px-4">
@@ -26,7 +28,6 @@ export function SearchEmpty({ query }) {
     </div>
   );
 }
-
 export function ErrorState({ message, onRetry }) {
   return (
     <div className="flex flex-col items-center justify-center py-14 text-center px-4">
@@ -36,7 +37,9 @@ export function ErrorState({ message, onRetry }) {
       <p className="text-sm font-medium text-ink-700 dark:text-ink-300 mb-1">Failed to load</p>
       <p className="text-xs text-ink-400 dark:text-ink-600 max-w-[220px] mb-4">{message}</p>
       {onRetry && (
-        <button onClick={onRetry} className="btn-secondary btn-sm">Retry</button>
+        <button onClick={onRetry} className="btn-secondary btn-sm">
+          Retry
+        </button>
       )}
     </div>
   );

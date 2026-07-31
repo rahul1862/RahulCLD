@@ -1,13 +1,27 @@
 import { NavLink } from "react-router-dom";
 import { LayoutDashboard, Users, UserPlus, Wallet, X } from "lucide-react";
-
 const NAV = [
-  { to: "/",        icon: LayoutDashboard, label: "Overview" },
-  { to: "/users",   icon: Users,           label: "People" },
-  { to: "/add",     icon: UserPlus,        label: "Add person" },
-  { to: "/finance", icon: Wallet,          label: "Finance" },
+  {
+    to: "/",
+    icon: LayoutDashboard,
+    label: "Overview",
+  },
+  {
+    to: "/users",
+    icon: Users,
+    label: "People",
+  },
+  {
+    to: "/add",
+    icon: UserPlus,
+    label: "Add person",
+  },
+  {
+    to: "/finance",
+    icon: Wallet,
+    label: "Finance",
+  },
 ];
-
 export default function Sidebar({ open, onClose }) {
   return (
     <>
@@ -54,14 +68,11 @@ export default function Sidebar({ open, onClose }) {
               to={to}
               end={to === "/"}
               onClick={onClose}
-              className={({ isActive }) =>
-                `flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium
+              className={({
+                isActive,
+              }) => `flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium
                  transition-colors duration-100 no-tap-highlight
-                 ${isActive
-                   ? "bg-ink-100 dark:bg-ink-800 text-ink-900 dark:text-ink-100"
-                   : "text-ink-500 dark:text-ink-500 hover:text-ink-800 dark:hover:text-ink-200 hover:bg-ink-50 dark:hover:bg-ink-900"
-                 }`
-              }
+                 ${isActive ? "bg-ink-100 dark:bg-ink-800 text-ink-900 dark:text-ink-100" : "text-ink-500 dark:text-ink-500 hover:text-ink-800 dark:hover:text-ink-200 hover:bg-ink-50 dark:hover:bg-ink-900"}`}
             >
               {({ isActive }) => (
                 <>

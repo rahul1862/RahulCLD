@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { transactionService } from "../services/api";
-
 export function useTransactions() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState(null);
-
+  const [error, setError] = useState(null);
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -19,16 +17,19 @@ export function useTransactions() {
       setLoading(false);
     }
   }, []);
-
-  useEffect(() => { load(); }, [load]);
-
-  return { transactions, loading, error, reload: load };
+  useEffect(() => {
+    load();
+  }, [load]);
+  return {
+    transactions,
+    loading,
+    error,
+    reload: load,
+  };
 }
-
 export function usePnl() {
-  const [pnl,     setPnl]     = useState(null);
+  const [pnl, setPnl] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -39,8 +40,12 @@ export function usePnl() {
       setLoading(false);
     }
   }, []);
-
-  useEffect(() => { load(); }, [load]);
-
-  return { pnl, loading, reload: load };
+  useEffect(() => {
+    load();
+  }, [load]);
+  return {
+    pnl,
+    loading,
+    reload: load,
+  };
 }

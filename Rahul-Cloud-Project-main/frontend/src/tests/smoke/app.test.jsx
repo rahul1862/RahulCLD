@@ -12,18 +12,21 @@ import EditUser from "../../pages/EditUser";
 import UserDetail from "../../pages/UserDetail";
 import NotFound from "../../pages/NotFound";
 import { userService } from "../../services/api";
-
 window.matchMedia ??= () => ({
   matches: false,
   addEventListener: () => {},
   removeEventListener: () => {},
 });
-
 vi.mock("../../services/api", () => ({
   userService: {
     getAll: vi.fn().mockResolvedValue([]),
     getById: vi.fn().mockResolvedValue(null),
-    stats: vi.fn().mockResolvedValue({ total: 0, recentUsers: 0, growthRate: 0, domainBreakdown: {} }),
+    stats: vi.fn().mockResolvedValue({
+      total: 0,
+      recentUsers: 0,
+      growthRate: 0,
+      domainBreakdown: {},
+    }),
     search: vi.fn().mockResolvedValue([]),
     create: vi.fn(),
     update: vi.fn(),
@@ -31,12 +34,16 @@ vi.mock("../../services/api", () => ({
   },
   authService: {
     login: vi.fn(),
-    me: vi.fn().mockResolvedValue({ user: { email: "admin@userhub.dev", role: "admin" } }),
+    me: vi.fn().mockResolvedValue({
+      user: {
+        email: "admin@userhub.dev",
+        role: "admin",
+      },
+    }),
   },
   getToken: vi.fn(() => "test-token"),
   setToken: vi.fn(),
 }));
-
 const renderApp = (route) =>
   render(
     <ThemeProvider>
@@ -58,25 +65,35 @@ const renderApp = (route) =>
       </ToastProvider>
     </ThemeProvider>
   );
-
 describe("app smoke test", () => {
   test("boots at the root route without crashing and shows the app shell", async () => {
     renderApp("/");
     expect(await screen.findByText("UserHub")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /overview/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /people/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", {
+        name: /overview/i,
+      })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", {
+        name: /people/i,
+      })
+    ).toBeInTheDocument();
     expect(userService.stats).toHaveBeenCalled();
   });
-
   test("boots at the /users route without crashing", async () => {
     renderApp("/users");
     expect(await screen.findByText("UserHub")).toBeInTheDocument();
     expect(userService.getAll).toHaveBeenCalled();
   });
-
   test("shows a not-found page for an unknown route", async () => {
     renderApp("/does-not-exist");
     expect(await screen.findByText("Page not found")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Overview", exact: true })).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", {
+        name: "Overview",
+        exact: true,
+      })
+    ).toBeInTheDocument();
   });
 });

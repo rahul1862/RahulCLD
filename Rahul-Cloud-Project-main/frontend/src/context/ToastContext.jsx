@@ -1,26 +1,36 @@
 import { createContext, useCallback, useContext, useState } from "react";
 import { CheckCircle2, XCircle, Info, X } from "lucide-react";
-
 const Ctx = createContext(null);
 let _n = 0;
-
 export function ToastProvider({ children }) {
   const [list, setList] = useState([]);
-
   const toast = useCallback((message, type = "success") => {
     const id = ++_n;
-    setList((t) => [...t, { id, message, type }]);
+    setList((t) => [
+      ...t,
+      {
+        id,
+        message,
+        type,
+      },
+    ]);
     setTimeout(() => setList((t) => t.filter((x) => x.id !== id)), 4200);
   }, []);
-
   const dismiss = (id) => setList((t) => t.filter((x) => x.id !== id));
-
   const meta = {
-    success: { icon: CheckCircle2, cls: "text-emerald-600 dark:text-emerald-400" },
-    error:   { icon: XCircle,      cls: "text-red-500 dark:text-red-400" },
-    info:    { icon: Info,         cls: "text-accent-600 dark:text-accent-400" },
+    success: {
+      icon: CheckCircle2,
+      cls: "text-emerald-600 dark:text-emerald-400",
+    },
+    error: {
+      icon: XCircle,
+      cls: "text-red-500 dark:text-red-400",
+    },
+    info: {
+      icon: Info,
+      cls: "text-accent-600 dark:text-accent-400",
+    },
   };
-
   return (
     <Ctx.Provider value={toast}>
       {children}
@@ -62,5 +72,4 @@ export function ToastProvider({ children }) {
     </Ctx.Provider>
   );
 }
-
 export const useToast = () => useContext(Ctx);

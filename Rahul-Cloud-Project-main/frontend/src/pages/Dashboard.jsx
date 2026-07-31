@@ -7,7 +7,6 @@ import Avatar from "../components/ui/Avatar";
 import { SkeletonRow } from "../components/ui/Skeleton";
 import { ErrorState, EmptyState, SearchEmpty } from "../components/ui/States";
 import { fmtDate } from "../utils/helpers";
-
 function Metric({ label, value, sub, loading }) {
   if (loading) {
     return (
@@ -33,7 +32,6 @@ function Metric({ label, value, sub, loading }) {
     </div>
   );
 }
-
 function DomainBar({ domain, count }) {
   return (
     <div className="group">
@@ -44,33 +42,37 @@ function DomainBar({ domain, count }) {
     </div>
   );
 }
-
 export default function Dashboard() {
   const { users, loading: uLoad, error: uErr, reload } = useUsers();
   const { stats, loading: sLoad } = useStats();
-  const [search,    setSearch]    = useState("");
-  const [results,   setResults]   = useState(null);
+  const [search, setSearch] = useState("");
+  const [results, setResults] = useState(null);
   const [searching, setSearching] = useState(false);
-
   useEffect(() => {
-    if (!search.trim()) { setResults(null); return; }
+    if (!search.trim()) {
+      setResults(null);
+      return;
+    }
     const t = setTimeout(async () => {
       setSearching(true);
-      try   { setResults(await userService.search(search)); }
-      catch { setResults([]); }
-      finally { setSearching(false); }
+      try {
+        setResults(await userService.search(search));
+      } catch {
+        setResults([]);
+      } finally {
+        setSearching(false);
+      }
     }, 350);
     return () => clearTimeout(t);
   }, [search]);
-
   const displayed = (results ?? users).slice(0, 8);
-  const domains   = stats
-    ? Object.entries(stats.domainBreakdown ?? {}).sort((a,b) => b[1]-a[1]).slice(0,5)
+  const domains = stats
+    ? Object.entries(stats.domainBreakdown ?? {})
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
     : [];
-
   return (
     <div className="page space-y-8">
-
       <section aria-label="Key metrics">
         <div className="flex items-start gap-8 sm:gap-12 overflow-x-auto pb-2 no-scrollbar">
           <Metric
@@ -83,7 +85,11 @@ export default function Dashboard() {
           <div className="w-px self-stretch bg-ink-100 dark:bg-ink-900 flex-shrink-0" />
           <Metric
             label="Growth"
-            value={stats?.growthRate !== undefined ? `${stats.growthRate > 0 ? "+" : ""}${stats.growthRate}%` : null}
+            value={
+              stats?.growthRate !== undefined
+                ? `${stats.growthRate > 0 ? "+" : ""}${stats.growthRate}%`
+                : null
+            }
             sub="week over week"
             trend={stats?.growthRate}
             loading={sLoad}
@@ -106,7 +112,6 @@ export default function Dashboard() {
       </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-6 items-start">
-
         <section
           className="
             bg-white dark:bg-ink-900
@@ -147,37 +152,62 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {uLoad || searching
-                ? Array(5).fill(0).map((_, i) => <SkeletonRow key={i} cols={5} />)
-                : uErr
-                ? <tr><td colSpan={5}><ErrorState message={uErr} onRetry={reload} /></td></tr>
-                : displayed.length === 0
-                ? <tr><td colSpan={5}>{search ? <SearchEmpty query={search} /> : <EmptyState title="No people yet" message="Add your first person to get started." />}</td></tr>
-                : displayed.map((u) => (
+              {uLoad || searching ? (
+                Array(5)
+                  .fill(0)
+                  .map((_, i) => <SkeletonRow key={i} cols={5} />)
+              ) : uErr ? (
+                <tr>
+                  <td colSpan={5}>
+                    <ErrorState message={uErr} onRetry={reload} />
+                  </td>
+                </tr>
+              ) : displayed.length === 0 ? (
+                <tr>
+                  <td colSpan={5}>
+                    {search ? (
+                      <SearchEmpty query={search} />
+                    ) : (
+                      <EmptyState
+                        title="No people yet"
+                        message="Add your first person to get started."
+                      />
+                    )}
+                  </td>
+                </tr>
+              ) : (
+                displayed.map((u) => (
                   <tr key={u._id}>
                     <td>
                       <div className="flex items-center gap-2.5">
                         <Avatar name={u.name} size="sm" />
                         <div className="min-w-0">
-                          <p className="text-[13px] font-medium text-ink-800 dark:text-ink-200 truncate">{u.name}</p>
-                          <p className="text-[11px] text-ink-400 dark:text-ink-600 truncate">{u.email}</p>
+                          <p className="text-[13px] font-medium text-ink-800 dark:text-ink-200 truncate">
+                            {u.name}
+                          </p>
+                          <p className="text-[11px] text-ink-400 dark:text-ink-600 truncate">
+                            {u.email}
+                          </p>
                         </div>
                       </div>
                     </td>
-                    <td className="hidden sm:table-cell text-[12px] text-ink-500 dark:text-ink-500">{u.address}</td>
-                    <td className="hidden md:table-cell text-[11px] text-ink-400 font-mono">{fmtDate(u.createdAt)}</td>
-                    <td className="hidden lg:table-cell text-[12px] text-ink-500 dark:text-ink-500 truncate max-w-[140px]">{u.company}</td>
+                    <td className="hidden sm:table-cell text-[12px] text-ink-500 dark:text-ink-500">
+                      {u.address}
+                    </td>
+                    <td className="hidden md:table-cell text-[11px] text-ink-400 font-mono">
+                      {fmtDate(u.createdAt)}
+                    </td>
+                    <td className="hidden lg:table-cell text-[12px] text-ink-500 dark:text-ink-500 truncate max-w-[140px]">
+                      {u.company}
+                    </td>
                     <td>
-                      <Link
-                        to={`/user/${u._id}`}
-                        className="btn-ghost btn-sm text-[11px]"
-                      >
+                      <Link to={`/user/${u._id}`} className="btn-ghost btn-sm text-[11px]">
                         View
                       </Link>
                     </td>
                   </tr>
                 ))
-              }
+              )}
             </tbody>
           </table>
         </section>

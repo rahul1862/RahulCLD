@@ -9,21 +9,25 @@ import { setupAuth } from "./routes/auth.js";
 import { apiLimiter, setupSecurityHeaders, validateRequest } from "./middleware/security.js";
 import { requireAuth } from "./lib/auth.js";
 import { requestLogger, errorLogger } from "./logger.js";
-
-const apiApp = createApp({ express, cors, db, generateUserPdf });
-
+const apiApp = createApp({
+  express,
+  cors,
+  db,
+  generateUserPdf,
+});
 const app = express();
 setupSecurityHeaders(app);
 app.use(cors());
 app.use(express.json());
 app.use(requestLogger);
 app.use(validateRequest);
-setupHealthCheck(app);        // public: /health, /ready, /live
-await setupAuth(app, { db }); // public: POST /api/auth/login  (GET /api/auth/me is self-guarded)
+setupHealthCheck(app);
+await setupAuth(app, {
+  db,
+});
 app.use("/api", apiLimiter);
-app.use("/api", requireAuth); // every remaining /api/* route requires a valid token
+app.use("/api", requireAuth);
 app.use(apiApp);
 app.use(errorLogger);
-
 export default app;
 export { validate, toApi, validateTransaction };

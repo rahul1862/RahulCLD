@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Pencil, Trash2, Mail, Building2, MapPin, Phone, Clock, FileDown } from "lucide-react";
+import {
+  ArrowLeft,
+  Pencil,
+  Trash2,
+  Mail,
+  Building2,
+  MapPin,
+  Phone,
+  Clock,
+  FileDown,
+} from "lucide-react";
 import { useUser } from "../hooks/useUsers";
 import { userService } from "../services/api";
 import { useToast } from "../context/ToastContext";
@@ -9,7 +19,6 @@ import { SkeletonProfile } from "../components/ui/Skeleton";
 import { ErrorState } from "../components/ui/States";
 import Avatar from "../components/ui/Avatar";
 import { fmtDate } from "../utils/helpers";
-
 function Field({ icon: Icon, label, value }) {
   if (!value) return null;
   return (
@@ -18,21 +27,21 @@ function Field({ icon: Icon, label, value }) {
         <Icon size={14} strokeWidth={1.8} />
       </div>
       <div className="min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-ink-400 dark:text-ink-600 mb-0.5">{label}</p>
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-ink-400 dark:text-ink-600 mb-0.5">
+          {label}
+        </p>
         <p className="text-[13px] text-ink-800 dark:text-ink-200 break-words">{value}</p>
       </div>
     </div>
   );
 }
-
 export default function UserDetail() {
-  const { id }   = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
-  const toast    = useToast();
+  const toast = useToast();
   const { user, loading, error } = useUser(id);
   const [delOpen, setDelOpen] = useState(false);
   const [pdfBusy, setPdfBusy] = useState(false);
-
   const handleDelete = async () => {
     try {
       await userService.remove(id);
@@ -42,7 +51,6 @@ export default function UserDetail() {
       toast(e.message, "error");
     }
   };
-
   const handleDownloadPdf = async () => {
     setPdfBusy(true);
     try {
@@ -53,7 +61,6 @@ export default function UserDetail() {
       setPdfBusy(false);
     }
   };
-
   return (
     <div className="page max-w-lg">
       <Link
@@ -65,7 +72,7 @@ export default function UserDetail() {
       </Link>
 
       {loading && <SkeletonProfile />}
-      {error   && <ErrorState message={error} />}
+      {error && <ErrorState message={error} />}
 
       {user && !loading && (
         <div className="animate-in">
@@ -91,18 +98,21 @@ export default function UserDetail() {
               <Link to={`/edit/${id}`} className="btn-secondary btn-sm">
                 <Pencil size={12} /> Edit
               </Link>
-              <button onClick={() => setDelOpen(true)} className="btn-ghost btn-sm text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+              <button
+                onClick={() => setDelOpen(true)}
+                className="btn-ghost btn-sm text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+              >
                 <Trash2 size={12} />
               </button>
             </div>
           </div>
 
           <div className="bg-white dark:bg-ink-900 border border-ink-200 dark:border-ink-800 rounded-xl px-4">
-            <Field icon={Mail}     label="Email"   value={user.email} />
+            <Field icon={Mail} label="Email" value={user.email} />
             <Field icon={Building2} label="Company" value={user.company} />
-            <Field icon={MapPin}   label="Address" value={user.address} />
-            <Field icon={Phone}  label="Phone"   value={user.phone} />
-            <Field icon={Clock}  label="Joined"  value={fmtDate(user.createdAt)} />
+            <Field icon={MapPin} label="Address" value={user.address} />
+            <Field icon={Phone} label="Phone" value={user.phone} />
+            <Field icon={Clock} label="Joined" value={fmtDate(user.createdAt)} />
           </div>
         </div>
       )}

@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { userService } from "../services/api";
-
 export function useUsers() {
-  const [users,   setUsers]   = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState(null);
-
+  const [error, setError] = useState(null);
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -19,39 +17,47 @@ export function useUsers() {
       setLoading(false);
     }
   }, []);
-
-  useEffect(() => { load(); }, [load]);
-
-  return { users, loading, error, reload: load };
+  useEffect(() => {
+    load();
+  }, [load]);
+  return {
+    users,
+    loading,
+    error,
+    reload: load,
+  };
 }
-
 export function useUser(id) {
-  const [user,    setUser]    = useState(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState(null);
-
+  const [error, setError] = useState(null);
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    userService.getById(id)
+    userService
+      .getById(id)
       .then(setUser)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [id]);
-
-  return { user, loading, error };
+  return {
+    user,
+    loading,
+    error,
+  };
 }
-
 export function useStats() {
-  const [stats,   setStats]   = useState(null);
+  const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
-    userService.stats()
+    userService
+      .stats()
       .then(setStats)
       .catch(() => setStats(null))
       .finally(() => setLoading(false));
   }, []);
-
-  return { stats, loading };
+  return {
+    stats,
+    loading,
+  };
 }

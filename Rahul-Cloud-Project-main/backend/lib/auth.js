@@ -1,23 +1,22 @@
 import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
 const JWT_SECRET = process.env.JWT_SECRET || "dev-insecure-secret-change-me";
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "8h";
 const BCRYPT_ROUNDS = 10;
-
 export const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "admin@userhub.dev").toLowerCase().trim();
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "userhub-demo";
 const MIN_PASSWORD_LENGTH = 8;
-
 export const REGISTRATION_ENABLED = process.env.ALLOW_REGISTRATION !== "false";
-
 if (process.env.NODE_ENV === "production" && !process.env.JWT_SECRET) {
-  console.warn("[auth] JWT_SECRET is not set; falling back to an insecure default. Set JWT_SECRET in the environment.");
+  console.warn(
+    "[auth] JWT_SECRET is not set; falling back to an insecure default. Set JWT_SECRET in the environment."
+  );
 }
-
-const normalizeEmail = (email) => String(email || "").toLowerCase().trim();
-
+const normalizeEmail = (email) =>
+  String(email || "")
+    .toLowerCase()
+    .trim();
 export async function ensureAuthSchema(db) {
   await db(`
     CREATE TABLE IF NOT EXISTS auth_users (
@@ -28,38 +27,47 @@ export async function ensureAuthSchema(db) {
       "createdAt" TEXT NOT NULL
     )
   `);
-
   const { rows } = await db("SELECT id FROM auth_users WHERE email = ?", [ADMIN_EMAIL]);
   if (!rows[0]) {
     await db(
       'INSERT INTO auth_users (id, email, "passwordHash", role, "createdAt") VALUES (?, ?, ?, ?, ?)',
-      [crypto.randomUUID(), ADMIN_EMAIL, bcrypt.hashSync(ADMIN_PASSWORD, BCRYPT_ROUNDS), "admin", new Date().toISOString()]
+      [
+        crypto.randomUUID(),
+        ADMIN_EMAIL,
+        bcrypt.hashSync(ADMIN_PASSWORD, BCRYPT_ROUNDS),
+        "admin",
+        new Date().toISOString(),
+      ]
     );
   }
 }
-
 export async function findUserByEmail(db, email) {
   const { rows } = await db("SELECT * FROM auth_users WHERE email = ?", [normalizeEmail(email)]);
   return rows[0];
 }
-
 export async function verifyCredentials(db, email, password) {
   const user = await findUserByEmail(db, email);
   if (!user) return null;
   return bcrypt.compareSync(String(password || ""), user.passwordHash) ? user : null;
 }
-
 export async function registerUser(db, email, password) {
   const normalized = normalizeEmail(email);
   const errors = {};
-  if (!normalized || !/^\S+@\S+\.\S+$/.test(normalized)) errors.email = "Enter a valid email address";
+  if (!normalized || !/^\S+@\S+\.\S+$/.test(normalized))
+    errors.email = "Enter a valid email address";
   if (!password || String(password).length < MIN_PASSWORD_LENGTH) {
     errors.password = `Must be at least ${MIN_PASSWORD_LENGTH} characters`;
   }
-  if (Object.keys(errors).length) return { errors };
-
-  if (await findUserByEmail(db, normalized)) return { errors: { email: "Email already in use" } };
-
+  if (Object.keys(errors).length)
+    return {
+      errors,
+    };
+  if (await findUserByEmail(db, normalized))
+    return {
+      errors: {
+        email: "Email already in use",
+      },
+    };
   const user = {
     id: crypto.randomUUID(),
     email: normalized,
@@ -71,28 +79,44 @@ export async function registerUser(db, email, password) {
     'INSERT INTO auth_users (id, email, "passwordHash", role, "createdAt") VALUES (?, ?, ?, ?, ?)',
     [user.id, user.email, user.passwordHash, user.role, user.createdAt]
   );
-  return { user };
+  return {
+    user,
+  };
 }
-
 export function signToken(user) {
-  return jwt.sign({ sub: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  return jwt.sign(
+    {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    },
+    JWT_SECRET,
+    {
+      expiresIn: JWT_EXPIRES_IN,
+    }
+  );
 }
-
 export function verifyToken(token) {
   return jwt.verify(token, JWT_SECRET);
 }
-
 export function requireAuth(req, res, next) {
   const [scheme, token] = String(req.headers.authorization || "").split(" ");
   if (scheme !== "Bearer" || !token) {
-    return res.status(401).json({ message: "Authentication required" });
+    return res.status(401).json({
+      message: "Authentication required",
+    });
   }
   try {
     req.user = verifyToken(token);
     next();
   } catch {
-    return res.status(401).json({ message: "Invalid or expired token" });
+    return res.status(401).json({
+      message: "Invalid or expired token",
+    });
   }
 }
-
-export const publicUser = (row) => ({ id: row.id, email: row.email, role: row.role });
+export const publicUser = (row) => ({
+  id: row.id,
+  email: row.email,
+  role: row.role,
+});

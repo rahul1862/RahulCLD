@@ -2,24 +2,23 @@ import { Menu, Sun, Moon, LogOut } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
 import { useLocation } from "react-router-dom";
-
 const TITLES = {
-  "/":        "Overview",
-  "/users":   "People",
-  "/add":     "Add person",
+  "/": "Overview",
+  "/users": "People",
+  "/add": "Add person",
   "/finance": "Finance",
 };
-
 export default function TopBar({ onMenuClick }) {
   const { dark, toggle } = useTheme();
   const { user, logout } = useAuth();
-  const { pathname }     = useLocation();
-
+  const { pathname } = useLocation();
   const title =
     TITLES[pathname] ||
-    (pathname.startsWith("/edit/") ? "Edit person" :
-     pathname.startsWith("/user/") ? "Profile" : "UserHub");
-
+    (pathname.startsWith("/edit/")
+      ? "Edit person"
+      : pathname.startsWith("/user/")
+        ? "Profile"
+        : "UserHub");
   return (
     <header
       className="
@@ -37,9 +36,7 @@ export default function TopBar({ onMenuClick }) {
         >
           <Menu size={16} />
         </button>
-        <h1 className="text-[13px] font-semibold text-ink-800 dark:text-ink-200">
-          {title}
-        </h1>
+        <h1 className="text-[13px] font-semibold text-ink-800 dark:text-ink-200">{title}</h1>
       </div>
 
       <div className="flex items-center gap-1.5">
@@ -53,10 +50,11 @@ export default function TopBar({ onMenuClick }) {
           className="btn-ghost btn-icon"
           aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
         >
-          {dark
-            ? <Sun size={15} className="text-ink-400" />
-            : <Moon size={15} className="text-ink-400" />
-          }
+          {dark ? (
+            <Sun size={15} className="text-ink-400" />
+          ) : (
+            <Moon size={15} className="text-ink-400" />
+          )}
         </button>
         <button
           onClick={logout}
