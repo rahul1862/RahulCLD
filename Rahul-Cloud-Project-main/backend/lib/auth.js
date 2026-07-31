@@ -2,9 +2,6 @@ import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-// Secrets and demo credentials are environment-driven. The defaults exist so the
-// app runs out-of-the-box for local dev, tests and the public portfolio demo —
-// production deployments MUST override JWT_SECRET / ADMIN_PASSWORD.
 const JWT_SECRET = process.env.JWT_SECRET || "dev-insecure-secret-change-me";
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "8h";
 const BCRYPT_ROUNDS = 10;
@@ -13,18 +10,14 @@ export const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "admin@userhub.dev").toLo
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "userhub-demo";
 const MIN_PASSWORD_LENGTH = 8;
 
-// Public self-registration is on by default (this is a public demo). Set
-// ALLOW_REGISTRATION=false to lock the app down to the seeded admin only.
 export const REGISTRATION_ENABLED = process.env.ALLOW_REGISTRATION !== "false";
 
 if (process.env.NODE_ENV === "production" && !process.env.JWT_SECRET) {
-  // Don't crash the process — just make the misconfiguration loud.
   console.warn("[auth] JWT_SECRET is not set; falling back to an insecure default. Set JWT_SECRET in the environment.");
 }
 
 const normalizeEmail = (email) => String(email || "").toLowerCase().trim();
 
-/** Create the auth_users table (idempotent) and seed the demo admin if absent. */
 export async function ensureAuthSchema(db) {
   await db(`
     CREATE TABLE IF NOT EXISTS auth_users (
@@ -50,18 +43,12 @@ export async function findUserByEmail(db, email) {
   return rows[0];
 }
 
-/** Return the user row on valid credentials, otherwise null. Timing-safe via bcrypt. */
 export async function verifyCredentials(db, email, password) {
   const user = await findUserByEmail(db, email);
   if (!user) return null;
   return bcrypt.compareSync(String(password || ""), user.passwordHash) ? user : null;
 }
 
-/**
- * Create a new login account. Returns { user } on success or { errors } on
- * validation failure / duplicate email — mirrors the { message, errors }
- * shape the rest of the API uses (see middleware/app.js's validate()).
- */
 export async function registerUser(db, email, password) {
   const normalized = normalizeEmail(email);
   const errors = {};
@@ -95,7 +82,6 @@ export function verifyToken(token) {
   return jwt.verify(token, JWT_SECRET);
 }
 
-/** Express middleware: rejects requests without a valid `Authorization: Bearer <jwt>`. */
 export function requireAuth(req, res, next) {
   const [scheme, token] = String(req.headers.authorization || "").split(" ");
   if (scheme !== "Bearer" || !token) {
@@ -109,5 +95,4 @@ export function requireAuth(req, res, next) {
   }
 }
 
-/** Shape a stored auth_users row for the API (never leak the password hash). */
 export const publicUser = (row) => ({ id: row.id, email: row.email, role: row.role });
